@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phát Video YouTube Tối Ưu với Avatar Moon - Nâng Cấp</title>
+    <link rel="icon" type="image/jpeg" href="/anhbia.jpg" sizes="32x32">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            transition: background 0.5s ease;
+        }
+        body.light-theme {
+            background: linear-gradient(135deg, #f0f0f0, #d9d9d9);
+            color: #333;
+        }
+        #player-container {
+            position: relative;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+            max-width: 960px;
+            width: 100%;
+            transition: box-shadow 0.3s ease;
+        }
+        #player-container:hover {
+            box-shadow: 0 16px 64px rgba(233, 69, 96, 0.4);
+        }
+        #youtube-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+        }
+        #custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #player-container:hover #custom-controls {
+            opacity: 1;
+        }
+        button {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        body.light-theme button {
+            background: rgba(0,0,0,0.1);
+            color: #333;
+        }
+        body.light-theme button:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        #progress-container {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #e94560, #ff6b81);
+            width: 0%;
+            transition: width 0.1s;
+        }
+        #time-display {
+            font-size: 14px;
+            min-width: 120px;
+            font-weight: 600;
+        }
+        #volume-control {
+            width: 100px;
+            cursor: pointer;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #e94560;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(233,69,96,0.5);
+        }
+        #tab-container {
+            display: flex;
+            gap: 12px;
+            margin: 25px 0;
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-weight: 600;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+            transform: scale(1.05);
+        }
+        .tab:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        body.light-theme .tab {
+            background: rgba(0,0,0,0.1);
+            color: #333;
+        }
+        body.light-theme .tab.active {
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+            color: #fff;
+        }
+        #tab-content {
+            background: rgba(255,255,255,0.15);
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 960px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        body.light-theme #tab-content {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        #tab-content div {
+            display: none;
+        }
+        #tab-content div.active {
+            display: block;
+        }
+        input[type="text"], input[type="password"], select {
+            padding: 14px;
+            border: 2px solid #e94560;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            width: 100%;
+            max-width: 500px;
+            margin: 12px 0;
+            font-size: 16px;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+            border-color: #ff6b81;
+        }
+        input[type="text"]::placeholder, input[type="password"]::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        body.light-theme input[type="text"], body.light-theme input[type="password"], body.light-theme select {
+            background: rgba(0,0,0,0.1);
+            color: #333;
+            border-color: #e94560;
+        }
+        body.light-theme input[type="text"]::placeholder, body.light-theme input[type="password"]::placeholder {
+            color: rgba(0,0,0,0.5);
+        }
+        #settings-tab label {
+            margin-right: 12px;
+            font-weight: 600;
+        }
+        .control-group {
+            margin: 12px 0;
+        }
+        #avatar-container, #tab-avatar-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        #avatar, #tab-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid #e94560;
+            object-fit: cover;
+            box-shadow: 0 0 8px rgba(233,69,96,0.6);
+            transition: transform 0.3s;
+        }
+        #avatar:hover, #tab-avatar:hover {
+            transform: rotate(360deg);
+        }
+        #avatar-name, #tab-avatar-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e94560;
+            text-shadow: 0 0 6px rgba(233, 69, 96, 0.6);
+        }
+        body.light-theme #avatar-name, body.light-theme #tab-avatar-name {
+            color: #e94560;
+            text-shadow: 0 0 6px rgba(233,69,96,0.3);
+        }
+        #upload-tab .upload-area {
+            border: 3px dashed #e94560;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255,255,255,0.08);
+            transition: background 0.2s, border 0.2s;
+        }
+        #upload-tab .upload-area:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #ff6b81;
+        }
+        #upload-tab .upload-area.dragover {
+            background: rgba(233, 69, 96, 0.4);
+            border-color: #ff6b81;
+        }
+        #url-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+            max-width: 960px;
+            margin-bottom: 25px;
+        }
+        #url-container button {
+            padding: 14px 28px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+            border-radius: 10px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        #url-container button:hover {
+            background: linear-gradient(135deg, #ff6b81, #e94560);
+            transform: scale(1.05);
+        }
+        #error-message {
+            color: #ff6b81;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+        #auth-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        #auth-container button {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        #login-modal, #register-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        body.light-theme .modal-content {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .modal-content input {
+            margin: 10px 0;
+        }
+        .modal-content button {
+            margin-top: 10px;
+        }
+        #close-login, #close-register {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        #playlist-tab ul {
+            list-style: none;
+            padding: 0;
+        }
+        #playlist-tab li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        #playlist-tab li:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        #playlist-tab button {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        #add-to-playlist {
+            margin-left: 12px;
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+        }
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #theme-toggle:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        body.light-theme #theme-toggle {
+            background: rgba(0,0,0,0.1);
+        }
+        body.light-theme #theme-toggle:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        #search-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 960px;
+        }
+        #search-input {
+            flex: 1;
+        }
+        #search-results {
+            display: none;
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #search-results ul {
+            list-style: none;
+            padding: 0;
+        }
+        #search-results li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #search-results li:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        #ad-skip-btn {
+            background: linear-gradient(135deg, #ff6b81, #e94560);
+            display: none;
+        }
+        #pip-btn {
+            background: rgba(255,255,255,0.2);
+        }
+        #loop-toggle, #shuffle-toggle {
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #loop-toggle.active, #shuffle-toggle.active {
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle">Chuyển Theme</button>
+    <div id="auth-container">
+        <span id="user-status">Khách</span>
+        <button id="login-btn">Đăng Nhập</button>
+        <button id="register-btn">Tạo Tài Khoản</button>
+        <button id="logout-btn" style="display: none;">Đăng Xuất</button>
+    </div>
+    <div id="avatar-container">
+        <img id="avatar" src="https://via.placeholder.com/60/1a1a2e/fff?text=Moon" alt="Avatar Moon">
+        <span id="avatar-name">Moon</span>
+    </div>
+    <h1 style="font-size: 32px; margin-bottom: 25px; text-shadow: 0 0 8px rgba(233,69,96,0.4);">Phát Video YouTube Tối Ưu - Nâng Cấp</h1>
+    <div id="url-container">
+        <input type="text" id="video-url" placeholder="Nhập link YouTube (ví dụ: https://www.youtube.com/watch?v=dQw4w9WgXcQ)">
+        <button onclick="loadVideo()">Tải Video</button>
+        <button id="add-to-playlist" onclick="addToPlaylist()" style="display: none;">Thêm Vào Playlist</button>
+    </div>
+    <div id="error-message">Link YouTube không hợp lệ!</div>
+    <div id="player-container">
+        <div id="youtube-player"></div>
+        <div id="custom-controls">
+            <button id="play-pause">▶</button>
+            <button id="skip-back">⏮ 10s</button>
+            <button id="skip-forward">10s ⏭</button>
+            <button id="speed-down">0.25x ↓</button>
+            <button id="speed-up">0.25x ↑</button>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <span id="time-display">0:00 / 0:00</span>
+            <input type="range" id="volume-control" min="0" max="100" value="100">
+            <button id="fullscreen">⛶</button>
+            <button id="ad-skip-btn" onclick="skipAd()">Bỏ Qua QC</button>
+            <button id="pip-btn" onclick="enterPiP()">PiP</button>
+        </div>
+    </div>
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Tìm kiếm video YouTube...">
+        <button onclick="searchVideos()">Tìm</button>
+    </div>
+    <div id="search-results">
+        <ul id="search-list"></ul>
+    </div>
+    <div id="tab-avatar-container">
+        <img id="tab-avatar" src="https://via.placeholder.com/60/1a1a2e/fff?text=Moon" alt="Avatar Moon">
+        <span id="tab-avatar-name">Moon</span>
+    </div>
+    <div id="tab-container">
+        <div class="tab active" data-tab="upload">Tải Avatar</div>
+        <div class="tab" data-tab="settings">Cài Đặt</div>
+        <div class="tab" data-tab="playlist">Playlist</div>
+    </div>
+    <div id="tab-content">
+        <div id="upload-tab" class="active">
+            <div class="upload-area" id="upload-area">
+                <p>Kéo thả hoặc click để tải ảnh avatar (JPG/PNG)</p>
+                <input type="file" id="avatar-upload" accept="image/jpeg,image/png" style="display: none;">
+            </div>
+        </div>
+        <div id="settings-tab">
+            <div class="control-group">
+                <label for="quality">Chất Lượng:</label>
+                <select id="quality">
+                    <option value="auto">Tự Động</option>
+                    <option value="144p">144p</option>
+                    <option value="240p">240p</option>
+                    <option value="360p">360p</option>
+                    <option value="480p">480p</option>
+                    <option value="720p">720p</option>
+                    <option value="1080p">1080p</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="playback-speed">Tốc Độ Phát:</label>
+                <select id="playback-speed">
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+            <div id="loop-toggle" onclick="toggleLoop()">Lặp Video: Tắt</div>
+            <div id="shuffle-toggle" onclick="toggleShuffle()">Xáo Trộn Playlist: Tắt</div>
+        </div>
+        <div id="playlist-tab">
+            <ul id="playlist-list"></ul>
+            <button onclick="playPlaylist()">Phát Toàn Bộ Playlist</button>
+        </div>
+    </div>
+
+    <div id="login-modal">
+        <div class="modal-content">
+            <span id="close-login">&times;</span>
+            <h2>Đăng Nhập</h2>
+            <input type="text" id="login-username" placeholder="Tên đăng nhập">
+            <input type="password" id="login-password" placeholder="Mật khẩu">
+            <button onclick="login()">Đăng Nhập</button>
+        </div>
+    </div>
+
+    <div id="register-modal">
+        <div class="modal-content">
+            <span id="close-register">&times;</span>
+            <h2>Tạo Tài Khoản</h2>
+            <input type="text" id="register-username" placeholder="Tên đăng nhập">
+            <input type="password" id="register-password" placeholder="Mật khẩu">
+            <button onclick="register()">Tạo</button>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let currentVideoId = '';
+        let currentUser = null; // {username, playlist: []}
+        let isGuest = true;
+        const GUEST_PLAYLIST_KEY = 'guest_playlist';
+        const USERS_KEY = 'users';
+        let loopEnabled = false;
+        let shuffleEnabled = false;
+        let currentPlaylistIndex = 0;
+        let adInterval;
+
+        // Load users from localStorage
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        }
+
+        // Save users to localStorage
+        function saveUsers(users) {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        // Get guest playlist
+        function getGuestPlaylist() {
+            return JSON.parse(sessionStorage.getItem(GUEST_PLAYLIST_KEY)) || [];
+        }
+
+        // Save guest playlist
+        function saveGuestPlaylist(playlist) {
+            sessionStorage.setItem(GUEST_PLAYLIST_KEY, JSON.stringify(playlist));
+        }
+
+        // Update UI based on user
+        function updateAuthUI() {
+            const userStatus = document.getElementById('user-status');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const addToPlaylistBtn = document.getElementById('add-to-playlist');
+
+            if (currentUser) {
+                userStatus.textContent = currentUser.username;
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+                isGuest = false;
+            } else {
+                userStatus.textContent = 'Khách';
+                loginBtn.style.display = 'inline-block';
+                registerBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+                isGuest = true;
+            }
+            addToPlaylistBtn.style.display = currentVideoId ? 'inline-block' : 'none';
+            updatePlaylistUI();
+        }
+
+        // Register new user
+        window.register = function() {
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value.trim();
+            if (!username || !password) {
+                alert('Vui lòng nhập đầy đủ!');
+                return;
+            }
+            let users = getUsers();
+            if (users.find(u => u.username === username)) {
+                alert('Tên đăng nhập đã tồn tại!');
+                return;
+            }
+            users.push({ username, password, playlist: [] });
+            saveUsers(users);
+            alert('Tạo tài khoản thành công!');
+            closeModals();
+        }
+
+        // Login user
+        window.login = function() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            let users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                alert('Sai tên đăng nhập hoặc mật khẩu!');
+                return;
+            }
+            currentUser = { username: user.username, playlist: user.playlist };
+            updateAuthUI();
+            closeModals();
+        }
+
+        // Logout
+        document.getElementById('logout-btn').onclick = () => {
+            // Save playlist back to users
+            let users = getUsers();
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            if (userIndex !== -1) {
+                users[userIndex].playlist = currentUser.playlist;
+                saveUsers(users);
+            }
+            currentUser = null;
+            updateAuthUI();
+        }
+
+        // Add to playlist
+        window.addToPlaylist = function() {
+            if (!currentVideoId) return;
+            let playlist;
+            let maxVideos = isGuest ? 1 : 5;
+            if (isGuest) {
+                playlist = getGuestPlaylist();
+            } else {
+                playlist = currentUser.playlist;
+            }
+            if (playlist.includes(currentVideoId)) {
+                alert('Video đã có trong playlist!');
+                return;
+            }
+            if (playlist.length >= maxVideos) {
+                alert(`Đã đạt giới hạn (${maxVideos} video)!`);
+                return;
+            }
+            playlist.push(currentVideoId);
+            if (isGuest) {
+                saveGuestPlaylist(playlist);
+            } else {
+                currentUser.playlist = playlist;
+            }
+            updatePlaylistUI();
+        }
+
+        // Update playlist UI
+        function updatePlaylistUI() {
+            const list = document.getElementById('playlist-list');
+            list.innerHTML = '';
+            let playlist = isGuest ? getGuestPlaylist() : (currentUser ? currentUser.playlist : []);
+            playlist.forEach((videoId, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>https://www.youtube.com/watch?v=${videoId}</span>
+                    <div>
+                        <button onclick="loadVideoFromPlaylist('${videoId}')">Phát</button>
+                        <button onclick="removeFromPlaylist(${index})">Xóa</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // Load video from playlist
+        window.loadVideoFromPlaylist = function(videoId) {
+            document.getElementById('video-url').value = `https://www.youtube.com/watch?v=${videoId}`;
+            loadVideo();
+        }
+
+        // Remove from playlist
+        window.removeFromPlaylist = function(index) {
+            let playlist;
+            if (isGuest) {
+                playlist = getGuestPlaylist();
+            } else {
+                playlist = currentUser.playlist;
+            }
+            playlist.splice(index, 1);
+            if (isGuest) {
+                saveGuestPlaylist(playlist);
+            } else {
+                currentUser.playlist = playlist;
+            }
+            updatePlaylistUI();
+        }
+
+        // Play entire playlist
+        window.playPlaylist = function() {
+            let playlist = isGuest ? getGuestPlaylist() : (currentUser ? currentUser.playlist : []);
+            if (playlist.length === 0) return;
+            if (shuffleEnabled) {
+                playlist = playlist.sort(() => Math.random() - 0.5);
+            }
+            currentPlaylistIndex = 0;
+            loadVideoFromPlaylist(playlist[currentPlaylistIndex]);
+        }
+
+        // Next video in playlist
+        function playNext() {
+            let playlist = isGuest ? getGuestPlaylist() : (currentUser ? currentUser.playlist : []);
+            if (shuffleEnabled) {
+                playlist = playlist.sort(() => Math.random() - 0.5);
+            }
+            currentPlaylistIndex = (currentPlaylistIndex + 1) % playlist.length;
+            loadVideoFromPlaylist(playlist[currentPlaylistIndex]);
+        }
+
+        // Toggle loop
+        window.toggleLoop = function() {
+            loopEnabled = !loopEnabled;
+            document.getElementById('loop-toggle').textContent = `Lặp Video: ${loopEnabled ? 'Bật' : 'Tắt'}`;
+            document.getElementById('loop-toggle').classList.toggle('active');
+        }
+
+        // Toggle shuffle
+        window.toggleShuffle = function() {
+            shuffleEnabled = !shuffleEnabled;
+            document.getElementById('shuffle-toggle').textContent = `Xáo Trộn Playlist: ${shuffleEnabled ? 'Bật' : 'Tắt'}`;
+            document.getElementById('shuffle-toggle').classList.toggle('active');
+        }
+
+        // Modals
+        document.getElementById('login-btn').onclick = () => {
+            document.getElementById('login-modal').style.display = 'flex';
+        }
+        document.getElementById('register-btn').onclick = () => {
+            document.getElementById('register-modal').style.display = 'flex';
+        }
+        document.getElementById('close-login').onclick = closeModals;
+        document.getElementById('close-register').onclick = closeModals;
+
+        function closeModals() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('register-modal').style.display = 'none';
+        }
+
+        // Theme toggle
+        document.getElementById('theme-toggle').onclick = () => {
+            document.body.classList.toggle('light-theme');
+        }
+
+        function onYouTubeIframeAPIReady() {
+            // Player sẽ được tạo khi loadVideo() được gọi
+        }
+
+        function getVideoId(url) {
+            const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+            return match ? match[1] : null;
+        }
+
+        window.loadVideo = function() {
+            const urlInput = document.getElementById('video-url');
+            const url = urlInput.value.trim();
+            const videoId = getVideoId(url);
+            const errorMessage = document.getElementById('error-message');
+
+            if (!videoId) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            errorMessage.style.display = 'none';
+            currentVideoId = videoId;
+            document.getElementById('add-to-playlist').style.display = 'inline-block';
+
+            if (player) {
+                player.loadVideoById(videoId);
+            } else {
+                player = new YT.Player('youtube-player', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: videoId,
+                    playerVars: {
+                        'playsinline': 1,
+                        'controls': 0,
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'showinfo': 0,
+                        'iv_load_policy': 3, // Ẩn chú thích
+                        'disablekb': 1 // Tắt phím tắt
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+            startAdBypass();
+        };
+
+        function onPlayerReady(event) {
+            updateProgress();
+            setupControls();
+            setupSettings();
+            setupAvatarUpload();
+            // Enter key to load video
+            document.getElementById('video-url').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loadVideo();
+                }
+            });
+            updateAuthUI(); // Initial update
+        }
+
+        function onPlayerStateChange(event) {
+            updatePlayPauseButton();
+            if (event.data === YT.PlayerState.ENDED) {
+                document.getElementById('play-pause').textContent = '▶';
+                if (loopEnabled) {
+                    player.playVideo();
+                } else {
+                    playNext();
+                }
+            }
+            detectAd(event);
+        }
+
+        function setupControls() {
+            // Play/Pause
+            document.getElementById('play-pause').onclick = () => {
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    player.pauseVideo();
+                } else {
+                    player.playVideo();
+                }
+            };
+
+            // Skip back 10s
+            document.getElementById('skip-back').onclick = () => {
+                player.seekTo(player.getCurrentTime() - 10, true);
+            };
+
+            // Skip forward 10s
+            document.getElementById('skip-forward').onclick = () => {
+                player.seekTo(player.getCurrentTime() + 10, true);
+            };
+
+            // Speed up/down
+            document.getElementById('speed-up').onclick = () => {
+                const speedSelect = document.getElementById('playback-speed');
+                const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                let current = parseFloat(speedSelect.value);
+                let next = speeds[Math.min(speeds.indexOf(current) + 1, speeds.length - 1)];
+                speedSelect.value = next;
+                player.setPlaybackRate(next);
+            };
+
+            document.getElementById('speed-down').onclick = () => {
+                const speedSelect = document.getElementById('playback-speed');
+                const speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+                let current = parseFloat(speedSelect.value);
+                let next = speeds[Math.max(speeds.indexOf(current) - 1, 0)];
+                speedSelect.value = next;
+                player.setPlaybackRate(next);
+            };
+
+            // Volume
+            document.getElementById('volume-control').oninput = (e) => {
+                player.setVolume(e.target.value);
+            };
+
+            // Progress bar click to seek
+            document.getElementById('progress-container').onclick = (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                const duration = player.getDuration();
+                player.seekTo(percent * duration, true);
+            };
+
+            // Fullscreen
+            document.getElementById('fullscreen').onclick = () => {
+                const container = document.getElementById('player-container');
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                }
+            };
+        }
+
+        function setupSettings() {
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('#tab-content div').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+
+            // Quality
+            document.getElementById('quality').onchange = (e) => {
+                player.setPlaybackQuality(e.target.value === 'auto' ? 'default' : e.target.value);
+            };
+
+            // Playback speed
+            document.getElementById('playback-speed').onchange = (e) => {
+                player.setPlaybackRate(parseFloat(e.target.value));
+            };
+        }
+
+        function setupAvatarUpload() {
+            const uploadArea = document.getElementById('upload-area');
+            const uploadInput = document.getElementById('avatar-upload');
+            const avatarImg = document.getElementById('avatar');
+            const tabAvatarImg = document.getElementById('tab-avatar');
+
+            // Click to open file dialog
+            uploadArea.addEventListener('click', () => {
+                uploadInput.click();
+            });
+
+            // Handle file drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                handleAvatarUpload(file);
+            });
+
+            // Handle file input
+            uploadInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                handleAvatarUpload(file);
+            });
+
+            function handleAvatarUpload(file) {
+                if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        avatarImg.src = e.target.result;
+                        tabAvatarImg.src = e.target.result;
+                        localStorage.setItem('avatar_src', e.target.result); // Save avatar locally
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Vui lòng chọn file JPG hoặc PNG!');
+                }
+            }
+
+            // Load saved avatar
+            const savedAvatar = localStorage.getItem('avatar_src');
+            if (savedAvatar) {
+                avatarImg.src = savedAvatar;
+                tabAvatarImg.src = savedAvatar;
+            }
+        }
+
+        function updatePlayPauseButton() {
+            const btn = document.getElementById('play-pause');
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                btn.textContent = '⏸';
+            } else {
+                btn.textContent = '▶';
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            if (!player || !player.getDuration) return;
+
+            const currentTime = player.getCurrentTime();
+            const duration = player.getDuration();
+            const percent = duration ? (currentTime / duration) * 100 : 0;
+
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('time-display').textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+
+            requestAnimationFrame(updateProgress);
+        }
+
+        // Chức năng bypass quảng cáo cực xịn (tự động skip khi phát hiện)
+        function startAdBypass() {
+            clearInterval(adInterval);
+            adInterval = setInterval(() => {
+                if (player.getAdState && player.getAdState() === 1) { // Đang phát quảng cáo
+                    skipAd();
+                }
+            }, 500);
+        }
+
+        window.skipAd = function() {
+            const adDuration = player.getDuration() - player.getCurrentTime();
+            if (adDuration > 0 && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                player.seekTo(player.getCurrentTime() + adDuration, true);
+            }
+            document.getElementById('ad-skip-btn').style.display = 'none';
+        }
+
+        function detectAd(event) {
+            if (event.data === YT.PlayerState.PLAYING && player.getCurrentTime() < 5 && player.getDuration() < 30) { // Giả định quảng cáo ngắn
+                document.getElementById('ad-skip-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('ad-skip-btn').style.display = 'none';
+            }
+        }
+
+        // Picture-in-Picture
+        window.enterPiP = function() {
+            const videoElement = player.getIframe().querySelector('video');
+            if (videoElement && videoElement.requestPictureInPicture) {
+                videoElement.requestPictureInPicture();
+            } else {
+                alert('Trình duyệt không hỗ trợ PiP!');
+            }
+        }
+
+        // Tìm kiếm video YouTube (sử dụng API đơn giản)
+        window.searchVideos = function() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+            const apiKey = 'YOUR_YOUTUBE_API_KEY'; // Thay bằng API key thực của bạn
+            fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&key=${apiKey}&maxResults=10`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('search-list');
+                    list.innerHTML = '';
+                    data.items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item.snippet.title;
+                        li.onclick = () => {
+                            document.getElementById('video-url').value = `https://www.youtube.com/watch?v=${item.id.videoId}`;
+                            loadVideo();
+                            document.getElementById('search-results').style.display = 'none';
+                        };
+                        list.appendChild(li);
+                    });
+                    document.getElementById('search-results').style.display = 'block';
+                })
+                .catch(error => console.error('Lỗi tìm kiếm:', error));
+        }
+    </script>
+</body>
+</html>
